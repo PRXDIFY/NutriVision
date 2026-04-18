@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NutriVision Ultra | Precision AI Diagnostics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #00D179;
+            --primary-blue: #007AFF;
+            --danger-red: #FF3B30;
+            --pure-white: #FFFFFF;
+            --bg-body: #F9FAFB;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --border-soft: rgba(0, 0, 0, 0.05);
+            --health-color: var(--primary-green);
+            --transition-premium: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            --p-padding: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        [lang="ar"] * { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.5;
+            cursor: none;
+        }
+
+        /* --- Custom Magnetic Cursor --- */
+        #cursor {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 122, 255, 0.3);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease-out, background 0.3s;
+            mix-blend-mode: multiply;
+        }
+
+        #cursor.hovered {
+            transform: scale(3);
+            background: rgba(0, 122, 255, 0.1);
+        }
+
+        @media (max-width: 1024px) { body { cursor: auto; } #cursor { display: none; } }
+
+        /* --- Global Noise & Cinematic Effects --- */
+        .noise {
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .ambient-blur {
+            position: fixed;
+            width: 60vw;
+            height: 60vw;
+            background: var(--primary-blue);
+            filter: blur(150px);
+            opacity: 0.05;
+            border-radius: 50%;
+            z-index: -1;
+            top: -10vw;
+            left: -10vw;
+            will-change: transform;
+        }
+
+        /* --- Shared Components --- */
+        .premium-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--border-soft);
+            border-radius: 32px;
+            padding: var(--p-padding);
+            transition: var(--transition-premium);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+            will-change: transform;
+        }
+
+        .btn-premium {
+            background: var(--text-main);
+            color: var(--pure-white);
+            border: none;
+            padding: 18px 36px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-premium);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* --- Landing Page --- */
+        #landing-page {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--p-padding);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 120px;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -1.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nvu-mark {
+            width: 42px;
+            height: 42px;
+            background: var(--text-main);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80vh;
+            gap: 60px;
+            padding-bottom: 100px;
+        }
+
+        .hero-content { flex: 1; }
+        .hero-display { flex: 1.2; position: relative; }
+
+        .hero-title {
+            font-size: 5.5rem;
+            line-height: 0.95;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -3px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            max-width: 520px;
+        }
+
+        .hero-img {
+            width: 100%;
+            border-radius: 48px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.1);
+            transform: perspective(2000px) rotateY(-8deg) rotateX(2deg);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 150px;
+        }
+
+        .bento-item {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .bento-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-body);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+        }
+
+        /* --- Transitions & Layers --- */
+        .app-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--bg-body);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-premium);
+        }
+
+        .app-layer.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(0.98);
+        }
+
+        /* --- Dashboard --- */
+        #dashboard {
+            overflow-y: auto;
+            align-items: stretch;
+            justify-content: flex-start;
+            padding: 40px;
+        }
+
+        .dash-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 32px;
+        }
+
+        .gauge-card { text-align: center; padding: 60px 40px; }
+        .score-val { font-size: 6.5rem; font-weight: 700; color: var(--health-color); display: block; }
+        
+        .gauge-svg { width: 100%; max-width: 320px; transform: rotate(-90deg); }
+        .g-bg { fill: none; stroke: #f0f0f0; stroke-width: 10; }
+        .g-fill { 
+            fill: none; stroke: var(--health-color); stroke-width: 10; 
+            stroke-linecap: round; stroke-dasharray: 880; stroke-dashoffset: 880;
+            transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .macro-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 20px;
+        }
+
+        .m-card { flex: 1; padding: 24px; text-align: center; }
+
+        /* --- Neural Coach --- */
+        .coach-card { height: 100%; display: flex; flex-direction: column; }
+        .chat-stream { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; gap: 16px; max-height: 550px; min-height: 400px; }
+        
+        .msg { padding: 18px 24px; border-radius: 24px; max-width: 85%; font-size: 1rem; position: relative; overflow: hidden; }
+        .msg.ai { background: #f3f4f6; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.user { background: var(--text-main); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .chat-input-row { display: flex; gap: 12px; margin-top: 24px; }
+        .chat-in { flex: 1; padding: 18px 28px; border-radius: 100px; border: 1px solid var(--border-soft); outline: none; font-size: 1rem; }
+
+        /* --- Toast System --- */
+        #toast-box { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+        .toast { background: #000; color: #fff; padding: 16px 32px; border-radius: 100px; font-weight: 600; box-shadow: 0 10px 40px rgba(0,0,0,0.15); animation: toastReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .toast.error { background: var(--danger-red); }
+
+        @keyframes toastReveal { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Responsive Master --- */
+        @media (max-width: 1100px) {
+            .dash-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 4.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            :root { --p-padding: 20px; }
+            nav { height: 100px; }
+            .hero { flex-direction: column; text-align: center; padding-top: 40px; gap: 40px; }
+            .hero-title { font-size: 3.5rem; letter-spacing: -1.5px; }
+            .hero-subtitle { margin: 0 auto 40px; }
+            .bento-grid { grid-template-columns: 1fr; }
+            .app-layer { padding: 20px; }
+            header { flex-direction: column; gap: 20px; align-items: flex-start; }
+            [dir="rtl"] header { align-items: flex-end; }
+            .macro-row { flex-direction: column; }
+        }
+
+        /* RTL Mirrors */
+        [dir="rtl"] { text-align: right; }
+        [dir="rtl"] .msg.ai { border-bottom-left-radius: 24px; border-bottom-right-radius: 4px; }
+        [dir="rtl"] .msg.user { border-bottom-right-radius: 24px; border-bottom-left-radius: 4px; }
+
+    </style>
+</head>
+<body>
+    <div id="cursor"></div>
+    <div class="noise"></div>
+    <div class="ambient-blur" id="blur"></div>
+
+    <!-- Phase 0: Master Landing -->
+    <main id="landing-page">
+        <nav>
+            <div class="logo"><div class="nvu-mark">NV</div>ULTRA.</div>
+            <button class="btn-premium" id="nav-start" data-i18n="start">GET STARTED</button>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <p style="color:var(--primary-blue); font-weight: 700; margin-bottom: 24px; letter-spacing: 3px; font-size: 0.9rem;" data-i18n="hero_tag">STRATEGIC LABS MASTERPIECE</p>
+                <h1 class="hero-title" id="h-title">Precision<br>Nutritional AI.</h1>
+                <p class="hero-subtitle" data-i18n="hero_sub">The ultimate clinical-grade diagnostic engine for the high-performance individual. Neural Core V3.5.</p>
+                <button class="btn-premium" style="padding: 20px 48px;" id="hero-start" data-i18n="hero_btn">INITIALIZE CORE &rarr;</button>
+            </div>
+            <div class="hero-display">
+                <img src="./nutrivision_hero_premium_1776523451693.png" alt="NVU AI" class="hero-img" id="hero-img">
+            </div>
+        </section>
+
+        <section class="bento-grid">
+            <div class="premium-card bento-item">
+                <div class="bento-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+                <h3 data-i18n="f1_t">Visual Intelligence</h3>
+                <p style="color:var(--text-muted)" data-i18n="f1_d">Optical lens capture with deep molecular element decoding.</p>
+            </div>
+            <div class="premium-card bento-item">
+                <div class="bento-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M2 12h20"/><path d="m16 8-4-4-4 4M16 16l-4 4-4-4"/></svg></div>
+                <h3 data-i18n="f2_t">Precision Data</h3>
+                <p style="color:var(--text-muted)" data-i18n="f2_d">Real-time clinical macro breakdown with elite science metrics.</p>
+            </div>
+            <div class="premium-card bento-item">
+                <div class="bento-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <h3 data-i18n="f3_t">Neural Coach</h3>
+                <p style="color:var(--text-muted)" data-i18n="f3_d">Advanced clinical strategists optimized for human longevity.</p>
+            </div>
+        </section>
+
+        <footer style="padding-bottom: 100px; display: flex; justify-content: space-between; border-top: 1px solid var(--border-soft); padding-top: 60px; font-size: 0.9rem; color: var(--text-muted);">
+            <div>&copy; 2026 STRATEGIC LABS. YHIA & RAED.</div>
+            <div style="display: flex; gap: 40px;"><span>V3.5.0</span><span>GITHUB MASTERPIECE</span></div>
+        </footer>
+    </main>
+
+    <!-- Phase 1: Build Core -->
+    <div id="build-core" class="app-layer hidden">
+        <div class="creator-silhouette" style="display: flex; gap: 30px; margin-bottom: 40px;">
+            <div class="nvu-mark" style="width: 80px; height: 80px; font-size: 2.5rem;">YH</div>
+            <div class="nvu-mark" style="width: 80px; height: 80px; font-size: 2.5rem;">RD</div>
+        </div>
+        <h1 style="font-size: 3.5rem; letter-spacing: -2px;">NVU <span style="color:var(--primary-blue)">CORE</span></h1>
+        <div id="build-log" style="margin-top: 40px; font-family: monospace; font-size: 0.95rem; opacity: 0.5;"></div>
+    </div>
+
+    <!-- Phase 2: Dashboard -->
+    <div id="dashboard" class="app-layer hidden">
+        <div class="dash-container">
+            <header>
+                <div class="logo"><div class="nvu-mark">NV</div>ULTRA.</div>
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <button class="btn-premium" style="background:#f0f0f0; color:var(--text-main); border:1px solid var(--border-soft)" id="lang-btn">AR/EN</button>
+                    <button class="btn-premium" id="scan-btn" data-i18n="scan">SCAN MEAL</button>
+                    <button class="btn-premium" style="background:var(--bg-body); color:var(--text-main); border:1px solid var(--border-soft)" id="man-btn">DESCRIBE</button>
+                </div>
+            </header>
+
+            <div class="dash-grid">
+                <div class="premium-card gauge-card">
+                    <div style="position: relative; display: inline-block;">
+                        <svg class="gauge-svg" viewBox="0 0 300 300">
+                            <circle class="g-bg" cx="150" cy="150" r="140"></circle>
+                            <circle id="g-fill" class="g-fill" cx="150" cy="150" r="140"></circle>
+                        </svg>
+                        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span id="score-val" class="score-val">--</span>
+                            <p style="letter-spacing: 6px; font-size: 0.85rem; opacity: 0.5;">HEALTH SCORE</p>
+                        </div>
+                    </div>
+
+                    <div class="macro-row">
+                        <div class="premium-card m-card">
+                            <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 8px;">PROTEIN</p>
+                            <h2 id="p-val">--</h2>
+                        </div>
+                        <div class="premium-card m-card">
+                            <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 8px;">CARBS</p>
+                            <h2 id="c-val">--</h2>
+                        </div>
+                        <div class="premium-card m-card">
+                            <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 8px;">FATS</p>
+                            <h2 id="f-val">--</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-card coach-card">
+                    <h3 style="border-bottom: 1px solid var(--border-soft); padding-bottom: 24px;">NEURAL STRATEGIST</h3>
+                    <div class="chat-stream" id="chat-stream"></div>
+                    <div class="chat-input-row">
+                        <input type="text" id="chat-in" class="chat-in" placeholder="Query clinical engine...">
+                        <button id="chat-send" style="background:var(--text-main); border:none; width: 60px; height: 60px; border-radius: 50%; color: #fff; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Component -->
+    <div id="man-modal" class="app-layer hidden">
+        <div class="premium-card" style="width: 90%; max-width: 500px;">
+            <h2 style="margin-bottom: 12px;">Clinical Narrative</h2>
+            <p style="color:var(--text-muted); margin-bottom: 24px;">Provide neural core with meal description.</p>
+            <textarea id="man-text" style="width: 100%; height: 160px; padding: 20px; border-radius: 20px; border: 1px solid var(--border-soft); outline: none; font-size: 1.1rem; resize: none;" placeholder="Example: Grilled lemon salmon with salad..."></textarea>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="btn-premium" style="flex: 1;" id="man-sub">ANALYZE</button>
+                <button class="btn-premium" style="background: none; color: var(--text-main); border: 1px solid var(--border-soft);" id="man-close">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-box"></div>
+    <input type="file" id="cam-input" accept="image/*" capture="environment" style="display: none;">
+
+    <script>
+        const API_KEYS = [
+            "AQ.Ab8RN6IkWjYv5Ht1GUu2fZBzSfo75ZNVfpJ2gnseyFCGN0giNg",
+            "AQ.Ab8RN6K4LaVQMRJJQ-l-OkjlpvluQXLf3wpSrhpCgCqEDn-kuw"
+        ];
+
+        let currentKeyIdx = 0;
+        const state = { lang: 'en', history: [] };
+
+        const translations = {
+            en: {
+                start: "GET STARTED",
+                hero_tag: "STRATEGIC LABS MASTERPIECE",
+                hero_title: "Precision<br>Nutritional AI.",
+                hero_sub: "The ultimate clinical-grade diagnostic engine for the high-performance individual. Neural Core V3.5.",
+                hero_btn: "INITIALIZE CORE &rarr;",
+                f1_t: "Visual Intelligence", f1_d: "Optical lens capture with deep molecular element decoding.",
+                f2_t: "Precision Data", f2_d: "Real-time clinical macro breakdown with elite science metrics.",
+                f3_t: "Neural Coach", f3_d: "Advanced clinical strategists optimized for human longevity.",
+                scan: "SCAN MEAL",
+                welcome: "Initialize a clinical scan to begin diagnostic stream.",
+                sync: ">> Syncing Y&R Protocol...", map: ">> Mapping Neural Layers...", 
+                link: ">> Establishing Secure Link...", ready: ">> NVU CORE READY."
+            },
+            ar: {
+                start: "ابدأ الآن",
+                hero_tag: "تـحـفـة مـخـتـبـرات سـتـراتـيـجـي",
+                hero_title: "ذكاء تغذوي<br>فائق الدقة.",
+                hero_sub: "أقـوى مـحـركات التـشخيص الإكـلـيـنـيـكـي للأفـراد ذوي الأداء العـالـي. الـنـواة V3.5.",
+                hero_btn: "تشغيل النواة &larr;",
+                f1_t: "الـذكـاء البصـري", f1_d: "التقاط عبر العدسة البصرية مع فك بنية العناصر الجزيئية.",
+                f2_t: "بيانات سـريـريّـة", f2_d: "تحليل العناصر الكبرى (الماكرو) في الوقت الفعلي بمقاييس دقيقة.",
+                f3_t: "المُـدرب العصبي", f3_d: "مستشارون إكلينيكيون ثنائيو اللغة مجهّزون لتحسين أدائك.",
+                scan: "فحص الوجبة",
+                welcome: "ابدأ الفحص الإكلينيكي لبدء دفق التشخيص.",
+                sync: ">> جاري المزامنة...", map: ">> تخطيط الطبقات...", 
+                link: ">> اتـصـال آمـن...", ready: ">> نواة NVU جـاهـزة."
+            }
+        };
+
+        // --- Core UI Logic ---
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.querySelectorAll('button, input, textarea, a').forEach(el => {
+            el.onmouseenter = () => cursor.classList.add('hovered');
+            el.onmouseleave = () => cursor.classList.remove('hovered');
+        });
+
+        // Parallax
+        window.addEventListener('scroll', () => {
+            const y = window.scrollY;
+            document.getElementById('hero-img').style.transform = `perspective(2000px) rotateY(-8deg) rotateX(2deg) translateY(${y * -0.1}px)`;
+            document.getElementById('blur').style.transform = `translate(${y * 0.1}px, ${y * 0.05}px)`;
+        });
+
+        // --- Application Transitions ---
+        async function startApp() {
+            document.getElementById('landing-page').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('landing-page').style.display = 'none';
+                document.getElementById('build-core').classList.remove('hidden');
+                runSequence();
+            }, 800);
+        }
+
+        async function runSequence() {
+            const log = document.getElementById('build-log');
+            const lines = [translations[state.lang].sync, translations[state.lang].map, translations[state.lang].link, translations[state.lang].ready];
+            for (let line of lines) {
+                const p = document.createElement('p');
+                p.textContent = line;
+                log.appendChild(p);
+                await new Promise(r => setTimeout(r, 700));
+            }
+            setTimeout(() => {
+                document.getElementById('build-core').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                appendMsg('ai', translations[state.lang].welcome, true);
+            }, 1000);
+        }
+
+        // --- Static Neural Engine ---
+        async function callNeuralCore(payload) {
+            let attempts = 0;
+            while (attempts < API_KEYS.length) {
+                const key = API_KEYS[currentKeyIdx];
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (res.ok) return data;
+                    if (res.status === 429 || res.status === 401) {
+                        currentKeyIdx = (currentKeyIdx + 1) % API_KEYS.length;
+                        attempts++;
+                    } else throw new Error();
+                } catch (e) { attempts++; }
+            }
+            showToast("Neural link failed. Reinitializing...", true);
+            return null;
+        }
+
+        async function analyzeMeal(data, isImage = true) {
+            const prompt = `Perform high-precision nutritional diagnostic. Output ONLY JSON: {"health_score": 0-100, "macros": {"p":g, "c":g, "f":g}, "advice": "short clinical sentence"}`;
+            let payload = { contents: [{ parts: [{ text: isImage ? prompt : `${prompt} Input: ${data}` }] }] };
+            if(isImage) payload.contents[0].parts.push({ inline_data: { mime_type: "image/jpeg", data: data.split(',')[1] } });
+
+            const result = await callNeuralCore(payload);
+            if (result && result.candidates) {
+                const text = result.candidates[0].content.parts[0].text;
+                const json = JSON.parse(text.match(/\{.*\}/s)[0]);
+                updateUIWithResults(json);
+            }
+        }
+
+        function updateUIWithResults(data) {
+            document.getElementById('score-val').textContent = data.health_score;
+            document.getElementById('p-val').textContent = data.macros.p + 'g';
+            document.getElementById('c-val').textContent = data.macros.c + 'g';
+            document.getElementById('f-val').textContent = data.macros.f + 'g';
+            document.getElementById('g-fill').style.strokeDashoffset = 880 - (880 * data.health_score / 100);
+            appendMsg('ai', data.advice, true);
+        }
+
+        function appendMsg(role, text, isTyped = false) {
+            const stream = document.getElementById('chat-stream');
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            stream.appendChild(div);
+            if (isTyped && role === 'ai') {
+                let i = 0;
+                function type() { if (i < text.length) { div.textContent += text.charAt(i); i++; stream.scrollTop = stream.scrollHeight; setTimeout(type, 20); } }
+                type();
+            } else div.textContent = text;
+            stream.scrollTop = stream.scrollHeight;
+            return div;
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chat-in');
+            const val = input.value.trim();
+            if (!val) return;
+            input.value = '';
+            appendMsg('user', val);
+            const typing = appendMsg('ai', '...');
+            const result = await callNeuralCore({ contents: [{ parts: [{ text: `Clinical query: ${val}. Context: RESPOND IN ${state.lang === 'en' ? 'ENGLISH' : 'ARABIC'}` }] }] });
+            if (result && result.candidates) {
+                const response = result.candidates[0].content.parts[0].text;
+                typing.textContent = "";
+                let i = 0;
+                function type() { if (i < response.length) { typing.textContent += response.charAt(i); i++; document.getElementById('chat-stream').scrollTop = 99999; setTimeout(type, 15); } }
+                type();
+            } else typing.remove();
+        }
+
+        function showToast(msg, isErr = false) {
+            const box = document.getElementById('toast-box');
+            const t = document.createElement('div');
+            t.className = `toast ${isErr ? 'error' : ''}`;
+            t.textContent = msg;
+            box.appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        // --- Listeners ---
+        document.getElementById('hero-start').onclick = startApp;
+        document.getElementById('nav-start').onclick = startApp;
+        document.getElementById('scan-btn').onclick = () => document.getElementById('cam-input').click();
+        document.getElementById('chat-send').onclick = sendChat;
+        document.getElementById('chat-in').onkeypress = e => { if(e.key === 'Enter') sendChat(); };
+        
+        document.getElementById('man-btn').onclick = () => document.getElementById('man-modal').classList.remove('hidden');
+        document.getElementById('man-close').onclick = () => document.getElementById('man-modal').classList.add('hidden');
+        document.getElementById('man-sub').onclick = () => {
+            const t = document.getElementById('man-text').value;
+            if(t.trim()){ document.getElementById('man-modal').classList.add('hidden'); analyzeMeal(t, false); }
+        };
+
+        document.getElementById('cam-input').onchange = e => {
+            const reader = new FileReader();
+            reader.onload = ev => analyzeMeal(ev.target.result, true);
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        document.getElementById('lang-btn').onclick = () => {
+            state.lang = state.lang === 'en' ? 'ar' : 'en';
+            document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = state.lang;
+            updateStrings();
+        };
+
+        function updateStrings() {
+            const t = translations[state.lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (t[k]) el.innerHTML = t[k];
+            });
+            document.getElementById('h-title').innerHTML = t.hero_title;
+        }
+
+        updateStrings();
+    </script>
+</body>
+</html>
