@@ -1,0 +1,68 @@
+<div id="dashboard" class="app-layer hidden">
+    <div class="dash-container" style="width: 100%; max-width: 1300px; margin: 0 auto; padding: 40px var(--p-padding);">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 48px;">
+            <div class="logo"><div class="nvu-mark">NV</div>ULTRA.</div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <button class="btn-premium" style="background:#f0f0f0; color:var(--text-main); border:1px solid var(--border-soft); padding: 10px 20px; font-size: 0.85rem;" id="dash-lang-btn">AR/EN</button>
+                <button class="btn-premium" style="padding: 10px 24px; font-size: 0.85rem;" id="scan-btn" data-i18n="scan">SCAN MEAL</button>
+                <button class="btn-premium" style="background:var(--bg-body); color:var(--text-main); border:1px solid var(--border-soft); padding: 10px 24px; font-size: 0.85rem;" id="man-btn">DESCRIBE</button>
+            </div>
+        </header>
+
+        <div class="dash-grid" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px;">
+            <div class="premium-card gauge-card" style="text-align: center; padding: 60px 40px; border-radius: 48px;">
+                <div style="position: relative; display: inline-block;">
+                    <svg class="gauge-svg" viewBox="0 0 300 300" style="width: 100%; max-width: 320px; transform: rotate(-90deg);">
+                        <circle class="g-bg" cx="150" cy="150" r="140" style="fill: none; stroke: #f0f0f0; stroke-width: 12;"></circle>
+                        <circle id="g-fill" class="g-fill" cx="150" cy="150" r="140" style="fill: none; stroke: var(--health-color); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 880; stroke-dashoffset: 880; transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
+                    </svg>
+                    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <span id="score-val" class="score-val" style="font-size: 7rem; font-weight: 800; color: var(--health-color);">--</span>
+                        <p style="letter-spacing: 8px; font-size: 0.9rem; opacity: 0.4; font-weight: 700;">HEALTH SCORE</p>
+                    </div>
+                </div>
+
+                <div class="macro-row" style="display: flex; gap: 24px; margin-top: 60px;">
+                    <div class="premium-card m-card" style="flex: 1; padding: 28px; text-align: center; border-radius: 32px; background: rgba(0,0,0,0.01);">
+                        <p style="font-size: 0.85rem; opacity: 0.5; margin-bottom: 12px; font-weight: 600;">PROTEIN</p>
+                        <h2 id="p-val" style="font-size: 2rem;">--</h2>
+                    </div>
+                    <div class="premium-card m-card" style="flex: 1; padding: 28px; text-align: center; border-radius: 32px; background: rgba(0,0,0,0.01);">
+                        <p style="font-size: 0.85rem; opacity: 0.5; margin-bottom: 12px; font-weight: 600;">CARBS</p>
+                        <h2 id="c-val" style="font-size: 2rem;">--</h2>
+                    </div>
+                    <div class="premium-card m-card" style="flex: 1; padding: 28px; text-align: center; border-radius: 32px; background: rgba(0,0,0,0.01);">
+                        <p style="font-size: 0.85rem; opacity: 0.5; margin-bottom: 12px; font-weight: 600;">FATS</p>
+                        <h2 id="f-val" style="font-size: 2rem;">--</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card coach-card" style="display: flex; flex-direction: column; border-radius: 48px;">
+                <h3 style="border-bottom: 1px solid var(--border-soft); padding-bottom: 24px; font-size: 1.4rem;" data-i18n="coach_title">NEURAL STRATEGIST</h3>
+                <div class="chat-stream" id="chat-stream" style="flex: 1; overflow-y: auto; padding: 24px 0; display: flex; flex-direction: column; gap: 20px; max-height: 550px;">
+                    <!-- AI Stream -->
+                </div>
+                <div class="chat-input-row" style="display: flex; gap: 12px; margin-top: 24px;">
+                    <input type="text" id="chat-in" class="chat-in" style="flex: 1; padding: 20px 30px; border-radius: 100px; border: 1px solid var(--border-soft); outline: none; font-size: 1.1rem; background: #fff;" placeholder="Query clinical engine...">
+                    <button id="chat-send" style="background:var(--text-main); border:none; width: 64px; height: 64px; border-radius: 50%; color: #fff; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manual Component -->
+<div id="man-modal" class="app-layer hidden">
+    <div class="premium-card" style="width: 90%; max-width: 520px; border-radius: 40px; padding: 48px;">
+        <h2 style="margin-bottom: 16px; font-size: 2rem;">Clinical Narrative</h2>
+        <p style="color:var(--text-muted); margin-bottom: 32px; font-size: 1.1rem;">Provide neural core with meal description.</p>
+        <textarea id="man-text" style="width: 100%; height: 180px; padding: 24px; border-radius: 24px; border: 1px solid var(--border-soft); outline: none; font-size: 1.2rem; resize: none; background: #fbfbfb;" placeholder="Example: Grilled lemon salmon with salad..."></textarea>
+        <div style="display: flex; gap: 16px; margin-top: 32px;">
+            <button class="btn-premium" style="flex: 1;" id="man-sub">ANALYZE</button>
+            <button class="btn-premium" style="background: none; color: var(--text-main); border: 1px solid var(--border-soft);" id="man-close">✕</button>
+        </div>
+    </div>
+</div>
