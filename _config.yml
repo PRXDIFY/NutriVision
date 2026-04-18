@@ -1,0 +1,14 @@
+title: NutriVision Ultra
+creators: Yhia & Raed
+division: Strategic Labs
+version: 3.5.0
+description: Precision AI Nutritional Diagnostics
+
+# Jekyll Settings
+markdown: kramdown
+theme: minima # Base theme if needed, but we use a custom masterpiece layout
+plugins:
+  - jekyll-feed
+
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site
